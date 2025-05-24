@@ -67,10 +67,10 @@ export default function InvoiceGenerator() {
     taxType: "percentage",
     notes: "",
     paymentDetails: {
-      bankName: "",
-      accountNumber: "",
-      accountName: "",
-      paymentMethod: "",
+      bankName: COMPANY_INFO.bankName || "",
+      accountNumber: COMPANY_INFO.bankAccountNumber || "",
+      accountName: COMPANY_INFO.bankAccountName || "",
+      paymentMethod: "Transfer Bank",
     },
   })
 
@@ -167,19 +167,19 @@ export default function InvoiceGenerator() {
 
     try {
       const html2pdf = (await import('html2pdf.js')).default;
-      
+
       const opt = {
         margin: [0.5, 0.75, 0.5, 0.75], // [top, right, bottom, left] margins in inches
         filename: `Invoice-${invoiceData.invoiceNumber || Date.now()}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
+        html2canvas: {
           scale: 2,
           useCORS: true,
           removeContainer: true,
         },
-        jsPDF: { 
-          unit: 'in', 
-          format: 'a4', 
+        jsPDF: {
+          unit: 'in',
+          format: 'a4',
           orientation: 'portrait',
         }
       };
@@ -455,7 +455,7 @@ export default function InvoiceGenerator() {
               </CardContent>
             </Card>
 
-            <Card>
+            {/* <Card>
               <CardHeader>
                 <CardTitle>Detail Pembayaran</CardTitle>
               </CardHeader>
@@ -501,7 +501,7 @@ export default function InvoiceGenerator() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
 
             <Card>
               <CardHeader>
