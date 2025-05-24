@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
-import { Plus, Trash2, FileText, Download, Printer } from "lucide-react"
+import { Plus, Trash2, FileText, Download, Printer } from "lucide-react";
 
 interface InvoiceItem {
   id: string
@@ -159,8 +159,25 @@ export default function InvoiceGenerator() {
     window.print()
   }
 
-  const handleDownloadPDF = () => {
-    window.print()
+  const handleDownloadPDF = async () => {
+    const element = printRef.current;
+    if (!element) return;
+
+    try {
+      const html2pdf = (await import('html2pdf.js')).default;
+      
+      const opt = {
+        margin: 1,
+        filename: `Invoice-${invoiceData.invoiceNumber || 'draft'}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(element).save();
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    }
   }
 
   return (
