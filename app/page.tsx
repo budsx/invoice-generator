@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
 import { Plus, Trash2, FileText, Download, Printer } from "lucide-react";
+import Image from 'next/image';
+import { COMPANY_LOGO, COMPANY_INFO } from '@/constants/config'
 
 interface InvoiceItem {
   id: string
@@ -47,10 +49,10 @@ export default function InvoiceGenerator() {
   const printRef = useRef<HTMLDivElement>(null)
 
   const [invoiceData, setInvoiceData] = useState<InvoiceData>({
-    companyName: "",
-    companyAddress: "",
-    companyPhone: "",
-    companyEmail: "",
+    companyName: COMPANY_INFO.name,
+    companyAddress: COMPANY_INFO.address,
+    companyPhone: COMPANY_INFO.phone,
+    companyEmail: COMPANY_INFO.email,
     clientName: "",
     clientAddress: "",
     clientPhone: "",
@@ -155,9 +157,9 @@ export default function InvoiceGenerator() {
     }).format(amount)
   }
 
-  const handlePrint = () => {
-    window.print()
-  }
+  // const handlePrint = () => {
+  //   window.print()
+  // }
 
   const handleDownloadPDF = async () => {
     const element = printRef.current;
@@ -167,14 +169,26 @@ export default function InvoiceGenerator() {
       const html2pdf = (await import('html2pdf.js')).default;
       
       const opt = {
-        margin: 1,
-        filename: `Invoice-${invoiceData.invoiceNumber || 'draft'}.pdf`,
+        margin: [0.5, 0.75, 0.5, 0.75], // [top, right, bottom, left] margins in inches
+        filename: `Invoice-${invoiceData.invoiceNumber || Date.now()}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+        html2canvas: { 
+          scale: 2,
+          useCORS: true,
+          removeContainer: true,
+        },
+        jsPDF: { 
+          unit: 'in', 
+          format: 'a4', 
+          orientation: 'portrait',
+        }
       };
 
-      html2pdf().set(opt).from(element).save();
+      // Remove border before PDF generation
+      element.style.border = 'none';
+      await html2pdf().set(opt).from(element).save();
+      // Restore border after PDF generation (for preview)
+      element.style.border = '1px solid #e5e7eb';
     } catch (error) {
       console.error('Error generating PDF:', error);
     }
@@ -191,7 +205,7 @@ export default function InvoiceGenerator() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Form Input */}
           <div className="space-y-6">
-            <Card>
+            {/* <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <FileText className="h-5 w-5" />
@@ -203,18 +217,18 @@ export default function InvoiceGenerator() {
                   <Label htmlFor="companyName">Nama Perusahaan</Label>
                   <Input
                     id="companyName"
-                    value={invoiceData.companyName}
-                    onChange={(e) => updateInvoiceData("companyName", e.target.value)}
-                    placeholder="PT. Contoh Perusahaan"
+                    value={COMPANY_INFO.name}
+                    disabled
+                    className="bg-gray-50"
                   />
                 </div>
                 <div>
                   <Label htmlFor="companyAddress">Alamat Perusahaan</Label>
                   <Textarea
                     id="companyAddress"
-                    value={invoiceData.companyAddress}
-                    onChange={(e) => updateInvoiceData("companyAddress", e.target.value)}
-                    placeholder="Jl. Contoh No. 123, Jakarta"
+                    value={COMPANY_INFO.address}
+                    disabled
+                    className="bg-gray-50"
                     rows={3}
                   />
                 </div>
@@ -223,9 +237,9 @@ export default function InvoiceGenerator() {
                     <Label htmlFor="companyPhone">Nomor Telepon</Label>
                     <Input
                       id="companyPhone"
-                      value={invoiceData.companyPhone}
-                      onChange={(e) => updateInvoiceData("companyPhone", e.target.value)}
-                      placeholder="+62 812-3456-7890"
+                      value={COMPANY_INFO.phone}
+                      disabled
+                      className="bg-gray-50"
                     />
                   </div>
                   <div>
@@ -233,14 +247,14 @@ export default function InvoiceGenerator() {
                     <Input
                       id="companyEmail"
                       type="email"
-                      value={invoiceData.companyEmail}
-                      onChange={(e) => updateInvoiceData("companyEmail", e.target.value)}
-                      placeholder="info@perusahaan.com"
+                      value={COMPANY_INFO.email}
+                      disabled
+                      className="bg-gray-50"
                     />
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
 
             <Card>
               <CardHeader>
@@ -504,11 +518,11 @@ export default function InvoiceGenerator() {
             </Card>
 
             <div className="flex gap-4">
-              <Button onClick={handlePrint} className="flex-1">
+              {/* <Button onClick={handlePrint} className="flex-1">
                 <Printer className="h-4 w-4 mr-2" />
                 Cetak Invoice
-              </Button>
-              <Button onClick={handleDownloadPDF} variant="outline" className="flex-1">
+              </Button> */}
+              <Button onClick={handleDownloadPDF} className="flex-1">
                 <Download className="h-4 w-4 mr-2" />
                 Unduh PDF
               </Button>
@@ -524,7 +538,23 @@ export default function InvoiceGenerator() {
               <CardContent>
                 <div ref={printRef} className="bg-white p-8 border rounded-lg print:border-0 print:shadow-none">
                   <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">INVOICE</h1>
+                    <div className="flex items-center justify-between mb-6">
+                      <div className="flex flex-col items-start gap-4">
+                        <Image
+                          src={COMPANY_LOGO.path}
+                          alt="Company Logo"
+                          width={COMPANY_LOGO.width}
+                          height={COMPANY_LOGO.height}
+                          className="object-contain"
+                          priority
+                        />
+                        <h1 className="text-3xl font-bold text-gray-900">INVOICE</h1>
+                      </div>
+                      <div className="text-right text-sm text-gray-600">
+                        <p>Invoice #{invoiceData.invoiceNumber || "INV-001"}</p>
+                        <p>Date: {invoiceData.date ? new Date(invoiceData.date).toLocaleDateString("id-ID") : "-"}</p>
+                      </div>
+                    </div>
                     <div className="grid grid-cols-2 gap-8">
                       <div>
                         <h3 className="font-semibold text-gray-700 mb-2">Dari:</h3>
@@ -694,6 +724,13 @@ export default function InvoiceGenerator() {
             top: 0;
             width: 100%;
           }
+          img {
+            display: block !important;
+          }
+        }
+        
+        @page {
+          margin: 0.5cm;
         }
       `}</style>
     </div>
