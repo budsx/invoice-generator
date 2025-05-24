@@ -169,25 +169,25 @@ export default function InvoiceGenerator() {
       const html2pdf = (await import('html2pdf.js')).default;
 
       const opt = {
-        margin: [0.5, 0.75, 0.5, 0.75], // [top, right, bottom, left] margins in inches
+        margin: [10, 10, 10, 10], // margins in mm
         filename: `Invoice-${invoiceData.invoiceNumber || Date.now()}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: {
           scale: 2,
           useCORS: true,
-          removeContainer: true,
+          letterRendering: true,
         },
         jsPDF: {
-          unit: 'in',
+          unit: 'mm',
           format: 'a4',
           orientation: 'portrait',
-        }
+          putTotalPages: true
+        },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
       };
 
-      // Remove border before PDF generation
       element.style.border = 'none';
       await html2pdf().set(opt).from(element).save();
-      // Restore border after PDF generation (for preview)
       element.style.border = '1px solid #e5e7eb';
     } catch (error) {
       console.error('Error generating PDF:', error);
@@ -728,18 +728,30 @@ export default function InvoiceGenerator() {
             visibility: visible;
           }
           .print\\:border-0 {
-            position: absolute;
-            left: 0;
-            top: 0;
+            position: relative !important;
             width: 100%;
           }
           img {
             display: block !important;
           }
+          table { page-break-inside: avoid; }
+          tr { page-break-inside: avoid; }
+          td { page-break-inside: avoid; }
+          thead { display: table-header-group; }
+          tfoot { display: table-footer-group; }
         }
         
         @page {
-          margin: 0.5cm;
+          margin: 10mm;
+          size: A4;
+        }
+
+        .page-break-avoid {
+          page-break-inside: avoid !important;
+        }
+
+        .page-break-after {
+          page-break-after: always !important;
         }
       `}</style>
     </div>
