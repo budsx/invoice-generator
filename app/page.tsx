@@ -352,40 +352,49 @@ export default function InvoiceGenerator() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {invoiceData.items.map((item, index) => (
-                    <div key={item.id} className="grid grid-cols-12 gap-2 items-end">
-                      <div className="col-span-5">
+                    <div key={item.id} className="space-y-4 p-4 border rounded-lg">
+                      <div className="space-y-2">
                         {index === 0 && <Label className="text-xs">Deskripsi</Label>}
-                        <Input
+                        <Textarea
                           value={item.description}
                           onChange={(e) => updateItem(item.id, "description", e.target.value)}
                           placeholder="Deskripsi produk/jasa"
+                          rows={2}
                         />
                       </div>
-                      <div className="col-span-2">
-                        {index === 0 && <Label className="text-xs">Kuantitas</Label>}
-                        <Input
-                          type="number"
-                          value={item.quantity}
-                          onChange={(e) => updateItem(item.id, "quantity", Number.parseInt(e.target.value) || 0)}
-                          min="1"
-                        />
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          {index === 0 && <Label className="text-xs">Kuantitas</Label>}
+                          <Input
+                            type="number"
+                            value={item.quantity}
+                            onChange={(e) => updateItem(item.id, "quantity", Number.parseInt(e.target.value) || 0)}
+                            min="1"
+                          />
+                        </div>
+                        <div>
+                          {index === 0 && <Label className="text-xs">Harga Satuan</Label>}
+                          <Input
+                            type="number"
+                            value={item.unitPrice}
+                            onChange={(e) => updateItem(item.id, "unitPrice", Number.parseFloat(e.target.value) || 0)}
+                            min="0"
+                          />
+                        </div>
                       </div>
-                      <div className="col-span-2">
-                        {index === 0 && <Label className="text-xs">Harga Satuan</Label>}
-                        <Input
-                          type="number"
-                          value={item.unitPrice}
-                          onChange={(e) => updateItem(item.id, "unitPrice", Number.parseFloat(e.target.value) || 0)}
-                          min="0"
-                        />
-                      </div>
-                      <div className="col-span-2">
-                        {index === 0 && <Label className="text-xs">Total</Label>}
-                        <Input value={formatCurrency(item.total)} readOnly className="bg-gray-50" />
-                      </div>
-                      <div className="col-span-1">
+
+                      <div className="flex items-center justify-between">
+                        <div className="w-1/2">
+                          {index === 0 && <Label className="text-xs">Total</Label>}
+                          <Input 
+                            value={formatCurrency(item.total)} 
+                            readOnly 
+                            className="bg-gray-50" 
+                          />
+                        </div>
                         {invoiceData.items.length > 1 && (
                           <Button
                             variant="outline"
