@@ -667,7 +667,7 @@ export default function InvoiceGenerator() {
                   {(invoiceData.paymentDetails.bankName || invoiceData.paymentDetails.accountNumber) && (
                     <div className="mb-6 border-t pt-4">
                       <h4 className="font-semibold text-gray-700 mb-3">Detail Pembayaran:</h4>
-                      <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="space-y-2 text-sm">
                         {invoiceData.paymentDetails.bankName && (
                           <div>
                             <span className="font-medium">Bank: </span>
